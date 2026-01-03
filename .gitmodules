@@ -1,3 +1,3 @@
 [submodule "gopro-dashboard-overlay"]
-	path = gopro-dashboard-overlay
+	path = Tools/gopro-dashboard-overlay
 	url = https://github.com/time4tea/gopro-dashboard-overlay
