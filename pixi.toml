@@ -1,0 +1,75 @@
+[workspace]
+name = "unreal-engine-env"
+channels = ["conda-forge", "nvidia"]
+platforms = ["linux-64"]
+
+[dependencies]
+# Standard UE dependencies
+openssl = "1.1.*"
+clang = "16.*"
+icu = "72.*"
+libglu = "9.0.*"
+pulseaudio = "16.*"
+nss = "3.*"
+xorg-libx11 = "*"
+
+ca-certificates = "*"
+
+libuuid = "*"
+fontconfig = "*"
+libsndfile = "*"       # audio - UE uses this alongside PulseAudio
+alsa-lib = "*"
+
+# x11
+
+xorg-libxrandr = "*"
+xorg-libxcursor = "*"
+xorg-libxi = "*"
+xorg-libxinerama = "*"
+xorg-libxfixes = "*"
+xorg-libxrender = "*"
+xorg-libxext = "*"
+xorg-libxcomposite = "*"
+xorg-libxdamage = "*"
+xorg-libxtst = "*"
+
+# Python
+pydantic = "*"
+pydantic-settings = "*"
+pandas = "*"
+pyyaml = "*"
+
+# Telemetry
+pyproj = "*"
+pyarrow = "*"  # Dataframe serialization
+
+# Development
+pytest = "*"
+
+[pypi-dependencies]
+flight_composer = { path = ".", editable = true }
+gpmf = "*"
+ffmpeg-python = "*"
+
+[system-requirements]
+libc = "2.35"
+linux = "5.15"
+cuda = "13.0"
+
+[tasks]
+# NOTE: $CONDA_PREFIX/lib is intentionally excluded from LD_LIBRARY_PATH.
+# UE bundles all its runtime dependencies (OpenSSL 1.1, ICU 53, etc.) and
+# needs nothing from the pixi environment. Including $CONDA_PREFIX/lib
+# exposes hundreds of conda libraries (including different builds of
+# libstdc++.so.6 and libgcc_s.so.1) that cause a crash on editor exit.
+# editor = "SDL_VIDEODRIVER=x11 /srv/Unreal/Engine/Binaries/Linux/UnrealEditor /home/andrzej/reps/flight_composer/Unreal/EPBC/EPBC.uproject"
+setup = "bash /srv/Unreal/Engine/Build/BatchFiles/Linux/Setup.sh && bash /srv/Unreal/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh"
+editor = """
+  MALLOC_CHECK_=0 \
+  G_SLICE=always-malloc \
+  PULSE_LATENCY_MSEC=60 \
+  SDL_VIDEODRIVER=x11 \
+  /srv/Unreal/Engine/Binaries/Linux/UnrealEditor \
+  /home/andrzej/reps/flight_composer/Unreal/EPBC/EPBC.uproject \
+  -nohmd
+"""

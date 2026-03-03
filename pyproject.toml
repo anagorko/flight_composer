@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flight_composer"
+authors = [
+    { name="Andrzej Nagórko", email="andrzej@nagorko.net" },
+]
+description = "Flight Composer"
+license.file = "LICENSE"
+readme = "README.md"
+dynamic = ["version"]
+requires-python = ">=3.10"
+
+dependencies = [
+    "gpxpy",
+    "invoke",
+    "libigc",
+    "moviepy",
+    "playwright",
+    "scipy",
+    "pandas",
+    "pandera",
+    "pyproj",
+    "rich",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+dev = [
+    "pre-commit",
+    "pytest",
+    "pytest-cov"
+]
+
+[project.urls]
+Homepage = "https://github.com/anagorko/flight_composer"
+
+[project.scripts]
+gpx-to-geojson = "flight_composer.scripts.gpx_to_geojson:main"
+igc-to-geojson = "flight_composer.scripts.igc_to_geojson:main"
+extract-gopro-telemetry = "flight_composer.scripts.extract_gopro_telemetry:main"
+
+[tool.hatch]
+version.source = "vcs"
+build.hooks.vcs.version-file = "src/flight_composer/_version.py"
+version.raw-options.write_to = "src/flight_composer/_version.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flight_composer"]

@@ -1,0 +1,31 @@
+# Unreal Generated Files
+**/Binaries/
+**/DerivedDataCache/
+**/Intermediate/
+**/Saved/
+**/Build/
+
+# IDE files (even if you use Zed, Unreal generates these)
+**/*.sln
+**/*.xcodeproj
+**/.vs/
+**/.idea/
+**/*.json # Be careful with this, but usually VSCode jsons are junk
+
+# OS
+.DS_Store
+Thumbs.db
+
+Tools/**
+
+# Downloaded files
+Fonts/
+Tools/
+
+# Output and generated files
+ProcessedData/
+**/__pycache__/
+src/flight_composer/_version.py
+
+# Temporary files
+trash/

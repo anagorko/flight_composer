@@ -13,6 +13,16 @@ class FlightComposerDirs(pydantic_settings.BaseSettings):
     GPX: pathlib.Path = PROCESSED_DATA / "GPXData"
     TELEMETRY: pathlib.Path = PROCESSED_DATA / "TelemetryData"
     TRAJECTORY: pathlib.Path = PROCESSED_DATA / "TrajectoryData"
+    ACTOR_DATA: pathlib.Path = PROCESSED_DATA / "ActorData"
+
+    UNREAL_ROOT: pathlib.Path = PROJECT_ROOT / "Unreal" / "EPBC"
+    SEQUENCE_DATA: pathlib.Path = (
+        UNREAL_ROOT / "Saved" / "FlightComposer" / "SequenceData"
+    )
+    SEQUENCE_CONFIG: pathlib.Path = PROJECT_ROOT / "SequenceConfig"
+
+    OVERLAY: pathlib.Path = PROCESSED_DATA / "Overlay"
+    FONT_PATH: pathlib.Path = PROJECT_ROOT / "Fonts"
 
 
 class FlightComposerConfig(pydantic_settings.BaseSettings):
