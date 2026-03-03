@@ -1,0 +1,18 @@
+szd_51_junior:
+  name: "SZD-51 Junior"
+  mass_kg: 340.0 # Dry empty weight (~240kg) + pilot weight (100kg)
+  wing_area_m2: 12.51 # Wing area (S) in square meters
+  wingspan_m: 15.0 # Wingspan (b) in meters
+  polar:
+    v1: 20.04
+    w1: -0.60 # ~72 km/h: Min sink
+    v2: 22.90
+    w2: -0.66 # ~82 km/h: Best glide
+    v3: 34.36
+    w3: -1.65 # ~123 km/h: High speed cruise
+
+
+# Add in the future:
+# szd_50_puchacz:
+#   name: "SZD-50 Puchacz"
+#   ...

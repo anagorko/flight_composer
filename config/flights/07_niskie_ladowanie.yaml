@@ -1,0 +1,20 @@
+flight_uid: "07"
+flight_tag: "07_niskie_ladowanie"
+
+glider_id: "szd_51_junior"
+airfield_id: "epbc"
+
+# Remember to include the timezone offset (+01:00 or +02:00 for Poland)
+official_takeoff_time: "2023-08-15T12:34:00+02:00"
+official_landing_time: "2023-08-15T13:45:00+02:00"
+
+wind_gradient:
+  - altitude_m: 0
+    speed_ms: 2.5
+    direction_deg: 270
+  - altitude_m: 500
+    speed_ms: 4.0
+    direction_deg: 285
+  - altitude_m: 1000
+    speed_ms: 6.2
+    direction_deg: 300

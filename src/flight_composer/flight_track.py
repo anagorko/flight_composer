@@ -44,10 +44,8 @@ import pandera.pandas as pa
 import pyproj
 
 from flight_composer.flight_data import (
-    Airfield,
+    FlightData,
     GliderSpecs,
-    GoProTelemetry,
-    IGCTelemetry,
 )
 from flight_composer.processing.assign_flight_phases import (
     FlightPhase,
@@ -189,18 +187,16 @@ class FlightTrack:
         return result
 
     @classmethod
-    def from_igc(
-        cls, igc: IGCTelemetry, airfield: Airfield = Airfield()
-    ) -> FlightTrack:
-        if igc.data is None:
+    def from_igc(cls, flight: FlightData) -> FlightTrack:
+        if flight.igc is None or flight.igc.data is None:
             raise ValueError("IGC data is None")
 
-        origin = airfield.origin
+        origin = flight.airfield.origin
         proj_aeqd = pyproj.Proj(
             proj="aeqd", lat_0=origin.lat, lon_0=origin.lon, datum="WGS84", units="m"
         )
 
-        df = igc.data.copy()
+        df = flight.igc.data.copy()
         df["x_m"], df["y_m"] = proj_aeqd(
             df["gps_lon_deg"].values, df["gps_lat_deg"].values
         )
@@ -211,22 +207,22 @@ class FlightTrack:
         df = sanitize_igc_telemetry(df)
         df = flight_track_schema.validate(df).copy()
         df = assign_flight_phases(df)
-        df = assign_flight_phases_hmm(df, airfield)
+        df = assign_flight_phases_hmm(df, flight.airfield)
         df = cls.trim_flight_phases(df)
-        df = fix_altitude_drift(df, airfield)
+        df = fix_altitude_drift(df, flight.airfield)
 
-        return cls(df)
+        track = cls(df)
+        track.glider_model = flight.glider_model
+        return track
 
     @classmethod
-    def from_gopro(
-        cls, gopro: GoProTelemetry, airfield: Airfield = Airfield()
-    ) -> FlightTrack:
-        if gopro.data is None:
+    def from_gopro(cls, flight: FlightData) -> FlightTrack:
+        if flight.gopro is None or flight.gopro.data is None:
             raise ValueError("GoPro data is None")
 
-        origin = airfield.origin
+        origin = flight.airfield.origin
 
-        df = gopro.data.copy()
+        df = flight.gopro.data.copy()
 
         proj_aeqd = pyproj.Proj(
             proj="aeqd", lat_0=origin.lat, lon_0=origin.lon, datum="WGS84", units="m"
@@ -242,11 +238,13 @@ class FlightTrack:
         df = sanitize_gopro_telemetry(df)
         df = flight_track_schema.validate(df).copy()
         df = assign_flight_phases(df)
-        df = assign_flight_phases_hmm(df, airfield)
+        df = assign_flight_phases_hmm(df, flight.airfield)
         df = cls.trim_flight_phases(df)
-        df = fix_altitude_drift(df, airfield)
+        df = fix_altitude_drift(df, flight.airfield)
 
-        return cls(df)
+        track = cls(df)
+        track.glider_model = flight.glider_model
+        return track
 
     @property
     def dataframe(self) -> pd.DataFrame:

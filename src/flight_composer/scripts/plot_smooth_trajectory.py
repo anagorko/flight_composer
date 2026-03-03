@@ -7,8 +7,8 @@ import pandas as pd
 
 from flight_composer.config import config
 from flight_composer.flight_data import GliderSpecs
+from flight_composer.load_flight_data import load_flight_data
 from flight_composer.logger import setup_logging
-from flight_composer.processing.flight_data_sources import find_data_sources
 
 
 def compute_wing_tips(
@@ -237,8 +237,8 @@ def main() -> None:
         args.wingspan_m if args.wingspan_m is not None else GliderSpecs().wingspan_m
     )
 
-    flight_data_sources = find_data_sources(flight_uid)
-    flight_tag = flight_data_sources.flight_tag
+    flight = load_flight_data(flight_uid)
+    flight_tag = flight.metadata.flight_tag
 
     trajectory_df_path = config.DIR.ACTOR_DATA / f"{flight_tag}_trajectory_df.parquet"
 

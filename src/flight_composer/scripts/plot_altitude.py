@@ -5,15 +5,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from flight_composer.config import config
 from flight_composer.flight_track import FlightTrack
+from flight_composer.load_flight_data import load_flight_data
 from flight_composer.logger import setup_logging
 from flight_composer.overlay_text import (
     get_flight_map_overlay_text,
     get_gopro_overlay_text,
 )
-from flight_composer.processing.extract_gopro_data import extract_gopro_data
-from flight_composer.processing.extract_igc_data import extract_igc_data
-from flight_composer.processing.flight_data_sources import find_data_sources
 
 # Map the string values of your FlightPhase enum to distinct colors
 PHASE_COLORS = {
@@ -73,36 +72,32 @@ def main() -> None:
     args = parser.parse_args()
 
     flight_uid = args.flight_uid
-    flight_data_sources = find_data_sources(flight_uid)
-    flight_tag = flight_data_sources.flight_tag
+    flight = load_flight_data(flight_uid)
+    flight_tag = flight.metadata.flight_tag
 
     logger.info(f"Processing flight [green]{flight_tag}[/green].")
 
     tracks_to_plot = []
 
     # 1. Load GoPro data
-    if flight_data_sources.gopro_path:
-        logger.info(f"Found GoPro data: {flight_data_sources.gopro_path}")
-        gopro_telemetry = extract_gopro_data(flight_data_sources.gopro_path)
-        if gopro_telemetry:
-            logger.info(
-                f"Extracted GoPro telemetry: [green]{get_gopro_overlay_text(gopro_telemetry)}[/green]"
-            )
-            gopro_track = FlightTrack.from_gopro(gopro_telemetry)
-            tracks_to_plot.append(("GoPro Track", gopro_track))
+    if flight.gopro:
+        logger.info(f"Found GoPro data: {flight.gopro_path}")
+        logger.info(
+            f"Extracted GoPro telemetry: [green]{get_gopro_overlay_text(flight.gopro)}[/green]"
+        )
+        gopro_track = FlightTrack.from_gopro(flight)
+        tracks_to_plot.append(("GoPro Track", gopro_track))
     else:
         logger.info("No GoPro data found.")
 
     # 2. Load IGC data
-    if flight_data_sources.igc_path:
-        logger.info(f"Found IGC data: {flight_data_sources.igc_path}")
-        igc_telemetry = extract_igc_data(flight_data_sources.igc_path)
-        if igc_telemetry:
-            logger.info(
-                f"Extracted IGC telemetry: [green]{get_flight_map_overlay_text(igc_telemetry)}[/green]"
-            )
-            igc_track = FlightTrack.from_igc(igc_telemetry)
-            tracks_to_plot.append(("IGC Track", igc_track))
+    if flight.igc:
+        logger.info(f"Found IGC data: {flight.igc_path}")
+        logger.info(
+            f"Extracted IGC telemetry: [green]{get_flight_map_overlay_text(flight.igc)}[/green]"
+        )
+        igc_track = FlightTrack.from_igc(flight)
+        tracks_to_plot.append(("IGC Track", igc_track))
     else:
         logger.info("No IGC data found.")
 
@@ -128,9 +123,10 @@ def main() -> None:
         plot_track_altitude(ax, track.dataframe, title)
 
     # 4. Save to SVG
-    output_filename = f"{flight_tag}_alt.svg"
-    plt.savefig(output_filename, format="svg", bbox_inches="tight")
-    logger.info(f"Successfully saved altitude plot to [green]{output_filename}[/green]")
+    config.DIR.PLOTS.mkdir(parents=True, exist_ok=True)
+    output_path = config.DIR.PLOTS / f"{flight_tag}_alt.svg"
+    plt.savefig(str(output_path), format="svg", bbox_inches="tight")
+    logger.info(f"Successfully saved altitude plot to [green]{output_path}[/green]")
 
 
 if __name__ == "__main__":

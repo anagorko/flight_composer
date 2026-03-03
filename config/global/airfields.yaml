@@ -1,0 +1,26 @@
+epbc:
+  icao_code: "EPBC"
+  name: "Warsaw Babice Airport"
+  name_pl: "Lotnisko Warszawa-Babice"
+  origin:
+    lat: 52.2689025181874
+    lon: 20.91072684036565
+    alt: 106.1
+
+epsu:
+  icao_code: "EPSU"
+  name: "Suwałki Airport"
+  name_pl: "Lotnisko Suwałki"
+  origin:
+    lat: 54.074416
+    lon: 22.900083
+    alt: 178.0
+
+epzr:
+  icao_code: "EPZR"
+  name: "Żar Airport"
+  name_pl: "Lotnisko Żar"
+  origin:
+    lat: 49.770972
+    lon: 19.218138
+    alt: 393.0

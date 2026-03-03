@@ -10,16 +10,16 @@ The entry point to the data processing pipeline is the `generate_actor_data.py` 
 
 ### Configuration
 
-Configuration is stored in `flight_composer/config.py` in the `config` singleton (`FlightComposerConfig`). The config object contains path information in `config.DIR` (`FlightComposerDirs`):
+The global `config` singleton (`FlightComposerConfig`) is built by `load_config()` in `src/flight_composer/config.py`. It loads all configuration from YAML files under `config/`:
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| `PROJECT_ROOT` | (auto) | Repository root |
-| `MP4` | `/srv/samba/share/GoProFlights` | Directory containing GoPro MP4 recordings |
-| `IGC` | `PROJECT_ROOT / "IGCData"` | Directory containing IGC flight logs |
-| `PROCESSED_DATA` | `PROJECT_ROOT / "ProcessedData"` | Base output directory |
-| `TELEMETRY` | `PROCESSED_DATA / "TelemetryData"` | Extracted telemetry Parquet files |
-| `ACTOR_DATA` | `PROCESSED_DATA / "ActorData"` | Final trajectory export (Parquet + CSV) |
+* **`config.DIR`** (`FlightComposerDirs`) — directory paths, loaded from `config/global/settings.yaml`. Relative paths are automatically resolved against `PROJECT_ROOT`. See the `FlightComposerDirs` model and `settings.yaml` for the full set of fields.
+* **`config.airfields`** — a `dict[str, Airfield]` registry loaded from `config/global/airfields.yaml`.
+* **`config.gliders`** — a `dict[str, GliderSpecs]` registry loaded from `config/global/gliders.yaml`.
+* **`config.sequences`** — a `dict[str, SequenceConfig]` loaded from all `config/sequences/*.yaml` files (used by the overlay pipeline, see [OVERLAY](OVERLAY.md)).
+
+The `Airfield` and `GliderSpecs` Pydantic models are defined in `src/flight_composer/flight_data.py`.
+
+Key directories used by this pipeline: `config.DIR.MP4`, `config.DIR.IGC`, `config.DIR.TELEMETRY`, `config.DIR.ACTOR_DATA`.
 
 ### Flight UIDs
 

@@ -1,0 +1,32 @@
+global:
+  resolution: [1920, 1080]
+  font_size: 36
+
+widgets:
+  - type: "speedup"
+    name: "speedup" # This dictates the output file prefix: speedup_0000.png
+    x: "85%"
+    y: "90%"
+    color: "white"
+    round: true # Set to false to see raw decimals like "1.14x"
+    font_size: 64 # Overrides the global font size of 24!
+
+  - type: "altitude"
+    name: "altitude"
+    x: "90%"
+    y: "10%"
+    title_text: "Alt [m]"
+    title_color: "#AAAAAA" # Light gray
+    title_font_size: 24
+    value_color: "white"
+    value_font_size: 72
+
+  - type: "speed"
+    name: "speed"
+    x: "80%"
+    y: "10%"
+    unit: "km/h" # Try changing to "m/s" to see the math automatically update
+    title_color: "#AAAAAA"
+    value_color: "white"
+    title_font_size: 24
+    value_font_size: 72

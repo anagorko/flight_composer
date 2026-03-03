@@ -5,15 +5,12 @@ This module implements the data processing pipeline for flight data.
 import logging
 
 from flight_composer.config import config
-from flight_composer.flight_data import FlightData
+from flight_composer.load_flight_data import load_flight_data
 from flight_composer.logger import setup_logging
 from flight_composer.overlay_text import (
     get_flight_map_overlay_text,
     get_gopro_overlay_text,
 )
-from flight_composer.processing.extract_gopro_data import extract_gopro_data
-from flight_composer.processing.extract_igc_data import extract_igc_data
-from flight_composer.processing.flight_data_sources import find_data_sources
 
 
 def main():
@@ -22,48 +19,38 @@ def main():
 
     logger.info("[yellow]Flight Composer Processor[/yellow]")
 
-    for flight_uid in config.FLIGHT_UIDS:
+    flight_uids = []
+    if config.DIR.FLIGHTS.exists():
+        for yaml_file in config.DIR.FLIGHTS.glob("*.yaml"):
+            # Extracts "07" from "07_niskie_ladowanie.yaml"
+            uid = yaml_file.name.split("_")[0]
+            flight_uids.append(uid)
+    flight_uids = sorted(list(set(flight_uids)))
+
+    for flight_uid in flight_uids:
         print()
 
-        ### 1. Source files discovery
+        ### 1. Load flight data (discovery + extraction in one step)
 
-        flight_data_sources = find_data_sources(flight_uid)
-        flight_tag = flight_data_sources.flight_tag
+        flight = load_flight_data(flight_uid)
+        flight_tag = flight.metadata.flight_tag
 
-        ### 2. MP4 telemetry data extraction
-        if flight_data_sources.gopro_path:
+        ### 2. Log extracted telemetry info
+        if flight.gopro:
             logger.info(
-                f"Extracting [bold]GoPro[/bold] telemetry data from {flight_data_sources.gopro_path}"
+                f"Extracted [bold]GoPro[/bold] telemetry data: "
+                f"[green]{get_gopro_overlay_text(flight.gopro)}[/green]"
             )
 
-            gopro_telemetry = extract_gopro_data(flight_data_sources.gopro_path)
-            if gopro_telemetry:
-                logger.info(
-                    f"Extracted MP4 telemetry data: [green]{get_gopro_overlay_text(gopro_telemetry)}[/green]"
-                )
-        else:
-            gopro_telemetry = None
-
-        if flight_data_sources.igc_path:
+        if flight.igc:
             logger.info(
-                f"Extracting [bold]IGC[/bold] telemetry data from {flight_data_sources.igc_path}"
+                f"Extracted [bold]IGC[/bold] telemetry data: "
+                f"[green]{get_flight_map_overlay_text(flight.igc)}[/green]"
             )
 
-            igc_telemetry = extract_igc_data(flight_data_sources.igc_path)
-            if igc_telemetry:
-                logger.info(
-                    f"Extracted IGC telemetry data: [green]{get_flight_map_overlay_text(igc_telemetry)}[/green]"
-                )
-        else:
-            igc_telemetry = None
-
-        _ = FlightData(
-            flight_uid=flight_uid,
-            flight_tag=flight_tag,
-            gopro=gopro_telemetry,
-            gopro_path=flight_data_sources.gopro_path,
-            igc=igc_telemetry,
-            igc_path=flight_data_sources.igc_path,
+        logger.info(
+            f"Flight [green]{flight_tag}[/green] loaded successfully. "
+            f"Airfield: {flight.airfield.icao_code}, Glider: {flight.glider_model.name}"
         )
 
 

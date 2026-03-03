@@ -268,6 +268,9 @@ class WindLayer(pydantic.BaseModel):
 class FlightMetadata(pydantic.BaseModel):
     """User-defined configuration and metadata parsed from YAML."""
 
+    flight_uid: str
+    flight_tag: str
+
     # References to global registries
     glider_id: str = pydantic.Field(default="szd_51_junior")
     airfield_id: str = pydantic.Field(default="epbc")
@@ -296,9 +299,6 @@ class FlightMetadata(pydantic.BaseModel):
 
 class FlightData(pydantic.BaseModel):
     """Top-level unified flight record."""
-
-    flight_uid: str
-    flight_tag: str
 
     # Configuration read from disk
     metadata: FlightMetadata
